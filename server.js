@@ -28,7 +28,16 @@ app.use(express.static("public"));
 
 // REPLACING THIS?!
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/week18Populater");
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI, {
+useMongoClient: true
+});
+
+// we were using local now this is connected to heroku
 
 // Routes
 
@@ -134,14 +143,3 @@ app.listen(PORT, function() {
 
 
 
-/////////////////////////////////////////////////////////////////
-//var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
-
-// Set mongoose to leverage built in JavaScript ES6 Promises
-// Connect to the Mongo DB
-//mongoose.Promise = Promise;
-//mongoose.connect(MONGODB_URI, {
-//  useMongoClient: true
-//});
-
-// we were using local now this is connected to heroku
