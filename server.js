@@ -26,16 +26,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use express.static to serve the public folder as a static directory
 app.use(express.static("public"));
 
-// REPLACING THIS?!
+// REPLACING THIS?!///////////////////////////////////
 // Connect to the Mongo DB
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
 
-// Set mongoose to leverage built in JavaScript ES6 Promises
+// Set mongoose to leverage built in JavaScript ES6 Promises ADDED THIS
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI, {
-useMongoClient: true
-});
+mongoose.connect(MONGODB_URI);
 
 // we were using local now this is connected to heroku
 
@@ -49,35 +47,43 @@ app.get("/scrape", function(req, res) {
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h2 within an article tag, and do the following:
-    $(".fl-post-feed-post fl-post-feed-image-above fl-post-align-default post-3328 post type-post status-publish format-standard has-post-thumbnail category-horoscopes entry").each(function(i, element) {
+    $(".fl-post-feed-post").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
-      // Add the text and href of every link, and save them as properties of the result object
-      result.title = $(this)
-        .find(".fl-post-feed-header")
-        .children("h2")
-        .children("a")
-        .attr("title");
-      result.link = $(this)
-        .find(".fl-post-feed-header")
-        .children("h2")
-        .children("a")
-        .attr("href");
-      results.summary = $(this)
-      .find("fl-post-feed-content")
-      .children("p")
-      .text();
+
+      result.title = $(element).find("h2.fl-post-feed-title").children("a").text();
+      result.link = $(element).find("h2.fl-post-feed-title").children("a").attr("href");
+      //result.summary = $(element).find("div.fl-post-feed-content").children("p").text();
+      // CREATE MODEL FOR SUMMARY TO COMPLETE
+
+      
+      
+       // Add the text and href of every link, and save them as properties of the result object
+      // result.title = $(element)
+      //   .find(".fl-post-feed-header")
+      //   .children("h2")
+      //   .children("a")
+      //   .attr("title");
+      // result.link = $(element)
+      //   .find(".fl-post-feed-header")
+      //   .children("h2")
+      //   .children("a")
+      //   .attr("href");
+      //results.summary = $(this)
+      //.find("fl-post-feed-content")
+      //.children("p")
+      //.text();
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
         .then(function(dbArticle) {
           // View the added result in the console
-          console.log(dbArticle);
+          // console.log(dbArticle);
         })
         .catch(function(err) {
           // If an error occurred, send it to the client
-          return res.json(err);
+          // return res.json(err);
         });
     });
 
